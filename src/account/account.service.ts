@@ -1,28 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Account } from './account.entity';
+
+import { FindAllAccountsUseCase } from './use-cases/find-all-accounts.use-case';
+import { FindAccountUseCase } from './use-cases/find-account.use-case';
+import { CreateAccountUseCase } from './use-cases/create-account.use-case';
+import { CreateAccountDto } from './dto/create-account.dto';
 
 @Injectable()
 export class AccountService {
   constructor(
-    @InjectRepository(Account)
-    private accountRepository: Repository<Account>,
+    private readonly findAllAccountsUseCase: FindAllAccountsUseCase,
+    private readonly findAccountUseCase: FindAccountUseCase,
+    private readonly createAccountUseCase: CreateAccountUseCase,
   ) {}
-  
 
   findAll() {
-    return this.accountRepository.find();
+    return this.findAllAccountsUseCase.execute();
   }
 
   findOne(id: number) {
-    return this.accountRepository.findOneBy({ id });
+    return this.findAccountUseCase.execute(id);
   }
-  
-  create(data: Partial<Account>) {
-    const account = this.accountRepository.create(data);
-    return this.accountRepository.save(account);
-  }
-  
-}
 
+  create(dto: CreateAccountDto) {
+    return this.createAccountUseCase.execute(dto);
+  }
+}
